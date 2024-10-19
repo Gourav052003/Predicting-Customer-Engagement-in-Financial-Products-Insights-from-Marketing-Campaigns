@@ -1,4 +1,4 @@
-# **Bank Term Deposit Subscription Prediction**
+# **Predicting-Customer-Engagement-in-Financial-Products-Insights-from-Marketing-Campaigns**
 
 ## **1. Project Overview**
 This project leverages machine learning to predict whether a customer will subscribe to a bank's term deposit based on data collected from direct marketing campaigns. By analyzing features such as customer demographics, previous interactions, and financial data, we aim to optimize marketing strategies for future campaigns.
@@ -97,7 +97,7 @@ Utilized **GridSearchCV** and **RandomizedSearchCV** for hyperparameter optimiza
 ## **9. How to Run the Project**
 Clone the repository:
 ```
-git clone https://github.com/your-username/bank-term-deposit-prediction.git
+git clone https://github.com/Gourav052003/Predicting-Customer-Engagement-in-Financial-Products-Insights-from-Marketing-Campaigns.git
 cd bank-term-deposit-prediction
 ```
 
