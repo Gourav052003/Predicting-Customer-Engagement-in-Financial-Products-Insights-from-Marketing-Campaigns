@@ -6,3 +6,10 @@ scikit-learn
 xgboost
 catboost
 lightgbm 
+PyYAML
+category_encoders
+imblearn
+streamlit
+altair<5
+python-box==7.1.1
+ensure==1.0.3
