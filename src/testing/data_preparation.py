@@ -1,4 +1,10 @@
+import os,sys
+path = os.path.abspath("src")
+sys.path.append(path)
+
 import pandas as pd
+from utils.logger import Logger
+logger = Logger(testing=True).create_logger()
 
 class DataPreparer():
        
@@ -26,6 +32,9 @@ class DataPreparer():
             "poutcome":[poutcome]
         })
         
+    logger.info("Data Preparation Initialized")
+        
     def getData(self):
+        logger.info("Data Preparation Completed")
         return self.__data
     

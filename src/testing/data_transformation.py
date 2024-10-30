@@ -1,26 +1,37 @@
+import os,sys
+path = os.path.abspath("src")
+sys.path.append(path)
+
 import numpy as np
 import pandas as pd
 from pickle import load
+from utils.constant import CONFIG_FILE_PATH
+from utils.read_files import read_yaml
+from utils.logger import Logger
+logger = Logger(testing=True).create_logger()
 
 class DataTransformer():
     
     def __init__(self,data):
+        config = read_yaml(CONFIG_FILE_PATH)
         self.__data = data
         
-        self.__scalers = {
-            "age":load(open(f"artifacts/min-max-scalers/age.pkl","rb")),
-            "balance":load(open(f"artifacts/min-max-scalers/balance.pkl","rb")),
-            "duration":load(open(f"artifacts/min-max-scalers/duration.pkl","rb"))
+        self.__min_max_scalers = {
+            "age":load(open(config.min_max_scalers.age,"rb")),
+            "balance":load(open(config.min_max_scalers.balance,"rb")),
+            "duration":load(open(config.min_max_scalers.duration,"rb"))
         }
 
         self.__one_hot_encoders = {
-            "marital":load(open(f"artifacts/one-hot-encoders/marital.pkl","rb")),
-            "contact":load(open(f"artifacts/one-hot-encoders/contact.pkl","rb"))   
+            "marital":load(open(config.one_hot_encoders.marital,"rb")),
+            "contact":load(open(config.one_hot_encoders.contact,"rb"))   
         }
 
         self.__cat_boost_encoders = {
-            "job":load(open(f"artifacts/cat-boost-encoders/job.pkl","rb"))
+            "job":load(open(config.cat_boost_encoders.job,"rb"))
         }
+        
+        logger.info("Data Transformer Initialized")
         
     
     def transform(self):
@@ -42,16 +53,21 @@ class DataTransformer():
         self.__data["previous"] = np.log1p(self.__data["previous"])
         
         
-        for feature,scaler in self.__scalers.items():
+        logger.info("min_max_scaler encoding")
+        for feature,scaler in self.__min_max_scalers.items():
             self.__data[feature] = scaler.transform(self.__data[[feature]])
         
+        logger.info("one_hot_encoding")
         for feature,one_hot_encoder in self.__one_hot_encoders.items():
             encoded_data = one_hot_encoder.transform(self.__data[[feature]])
             encoded_df = pd.DataFrame(encoded_data,columns=[f"{feature}_0",f"{feature}_1"])
             self.__data = pd.concat([encoded_df,self.__data],axis=1)
             self.__data.drop([feature],inplace=True,axis=1)
         
+        logger.info("cat_boost")
         catboost_encoder = self.__cat_boost_encoders["job"]
         self.__data["job"] = catboost_encoder.transform((self.__data["job"]))
-            
+        
+        logger.info("Data Transformation Completed")
+        
         return self.__data

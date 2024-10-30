@@ -1,0 +1,26 @@
+min_max_scalers:
+  root: "artifacts/min-max-scalers"
+  age: "artifacts/min-max-scalers/age.pkl"
+  balance: "artifacts/min-max-scalers/balance.pkl"
+  duration: "artifacts/min-max-scalers/duration.pkl"
+
+one_hot_encoders:
+  root: "artifacts/one-hot-encoders"
+  marital: "artifacts/one-hot-encoders/marital.pkl"
+  contact: "artifacts/one-hot-encoders/contact.pkl"
+
+cat_boost_encoders:
+  root: "artifacts/cat-boost-encoders"
+  job: "artifacts/cat-boost-encoders/job.pkl"
+
+logs:
+  training: "src/logs/training"
+  testing: "src/logs/testing"
+
+models:
+  results: "results/results.csv"
+  base_model: "models/base models"
+  fine_tuned_model: "models/fine-tuned model"
+  best_model: "models/best model/CatBoostClassifier.pkl"
+  best_model_root: "models/best model"
+
