@@ -64,19 +64,13 @@ class DataTransformer():
                 
         logger.info("one hot encoding")
         for feature,one_hot_encoder in self.__one_hot_encoders.items():
-            logger.info(f"1., {self.__data['contact'].unique()},{self.__data.shape}")
             one_hot_encoder.fit(self.__data[[feature]])
             encoded_data = one_hot_encoder.transform(self.__data[[feature]])
             encoded_df = pd.DataFrame(encoded_data,columns=[f"{feature}_0",f"{feature}_1"])
-            logger.info(encoded_df.shape)
-            logger.info(f"2., {self.__data['contact'].unique()},,{self.__data.shape}")
             self.__data.reset_index(inplace=True,drop=True)
             self.__data = pd.concat([encoded_df,self.__data],axis=1)
-            # self.__data = encoded_df.join(self.__data)
-            logger.info(f"3. {self.__data['contact'].unique()},,{self.__data.shape}")
             self.__data.drop([feature],inplace=True,axis=1)
-            # self.__data.dropna(inplace=True)
-            
+                    
             dump(one_hot_encoder,open(f"{self.__config.one_hot_encoders.root}/{feature}.pkl",'wb'))
           
         logger.info("catboost encoding")
