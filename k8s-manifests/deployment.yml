@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Unique key of the Deployment instance
+  name: term-deposits-deployment
+spec:
+  # 3 Pods should exist at all times.
+  replicas: 2
+  selector:
+    matchLabels:
+      app: term-deposits-label
+  template:
+    metadata:
+      labels:
+        # Apply this label to pods and default
+        # the Deployment label selector to this value
+        app: term-deposits-label
+    spec:
+      containers:
+      - name: term-deposits-container
+        # Run this image
+        image: gourav052003/term-deposits:1
