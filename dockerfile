@@ -10,7 +10,7 @@ COPY . /application/
 EXPOSE 8501 8502
 
 # Install Python dependencies
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Set the command to run the application
 CMD ["supervisord", "-c", "/application/supervisord.conf"]
