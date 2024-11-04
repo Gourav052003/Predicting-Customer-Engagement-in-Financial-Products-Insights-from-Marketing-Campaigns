@@ -14,3 +14,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Set the command to run the application
 CMD ["supervisord", "-c", "/application/supervisord.conf"]
+
+#End-of-File
