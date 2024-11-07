@@ -1,0 +1,96 @@
+pipeline{
+    agent any
+    
+    environment{
+        DOCKER_USERNAME = credentials('docker_username')
+        DOCKER_PASSWORD = credentials('docker_password')
+        DOCKER_IMAGE_NAME = credentials('docker_image_name')
+    
+        GITHUB_USERNAME = credentials('GitHub-username')
+        GITHUB_REPOSITORY_NAME = credentials('github_repository_name')
+        GITHUB_REPOSITORY_URL = credentials('GitHub-Repository-URL')
+        GITHUB_PAT_TOKEN = credentials('GitHub-PAT-token')
+        
+        KUBERNETES_SERVER_ENDPOINT_URL = credentials('kubernetes_server_endpoint_URL')
+        KUBERNETES_CA_CERTIFICATE = credentials('authority-certificate')
+    }
+    
+    stages{
+        stage('Build Source Code'){
+            steps{
+                checkout scmGit(branches: [[name: '*/main']], 
+                                extensions: [], 
+                                userRemoteConfigs: [[url: GITHUB_REPOSITORY_URL]]
+                )
+            }
+        }
+        
+        stage('Docker Image Build'){
+            steps{
+                script{
+                    bat 'docker build -t %DOCKER_USERNAME%/%DOCKER_IMAGE_NAME%:%BUILD_NUMBER% .'
+                }
+            }
+        }
+        
+        stage('Docker Login & Image Push'){
+            steps{
+                script{
+                    bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
+                    bat 'docker push %DOCKER_USERNAME%/%DOCKER_IMAGE_NAME%:%BUILD_NUMBER%'
+                }
+            }
+        }
+        
+        stage('Update deployment.yml'){
+            steps{
+                script {
+                 
+                    powershell """
+                    (Get-Content './k8s-manifests/deployment.yml') -replace 'image: $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:.*', 'image: $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$BUILD_NUMBER' | Set-Content './k8s-manifests/deployment.yml'
+                    """
+                
+                }
+            }
+        }
+        
+        stage('Commit and Push Changes') {
+            steps {
+                 script {
+                
+                    bat """
+                        git config user.name 'Jenkins CI'
+                        git config user.email 'jenkins@ci.com'
+                        git remote set-url origin https://%GITHUB_USERNAME%:%GITHUB_PAT_TOKEN%@github.com/%GITHUB_USERNAME%/%GITHUB_REPOSITORY_NAME%.git
+                        git checkout main
+                        git add ./k8s-manifests/deployment.yml
+                        git commit -m "Update deployment.yml with new image tag %BUILD_NUBBER%"
+                        git push origin main
+                    """
+                }
+            }
+        }
+        stage('Deploy Docker Image to Kubernetes'){
+            steps{
+                
+                script {
+                    // Using withCredentials to access the secret file
+                    withCredentials([file(credentialsId: 'authority-certificate', variable: 'SECRET_FILE')]) {
+                       
+                        def secretContent = readFile(env.SECRET_FILE)
+                       
+                        withKubeConfig(caCertificate: secretContent, clusterName: 'minikube', contextName: 'minikube', 
+                        credentialsId: 'jenkins-secret', namespace: 'jenkins', restrictKubeConfigAccess: false, 
+                        serverUrl: KUBERNETES_SERVER_ENDPOINT_URL) {
+                            bat 'kubectl apply -f ./k8s-manifests/deployment.yml --v=8'
+                            bat 'kubectl apply -f ./k8s-manifests/service.yml --v=8'
+                            bat 'kubectl get deployments'
+                            bat 'kubectl get services'
+                            
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
