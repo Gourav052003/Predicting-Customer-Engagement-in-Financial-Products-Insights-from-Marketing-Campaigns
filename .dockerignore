@@ -5,3 +5,7 @@ venv
 .gitignore
 LICENSE
 README.md
+models/base models/*.pkl
+artifacts/transformed data/*.csv
+artifacts/cleaned data/*.csv
+data/*.csv
