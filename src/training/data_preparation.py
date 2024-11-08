@@ -14,6 +14,7 @@ class DataPreparer():
     
     def getData(self):
         self.__data = pd.read_csv(self.__data)
+        self.__data.to_csv('train.csv',index=False)
         logger.info(self.__data["contact"].unique())
         logger.info("Data Preparation completed")
         return self.__data
