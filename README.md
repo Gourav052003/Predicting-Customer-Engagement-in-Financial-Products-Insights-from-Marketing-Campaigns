@@ -1,6 +1,6 @@
 # **Predicting-Customer-Engagement-in-Financial-Products-Insights-from-Marketing-Campaigns**
 
-## **1. Project Overview**
+## **1. Project-Overview**
 This project leverages machine learning to predict whether a customer will subscribe to a bank's term deposit based on data collected from direct marketing campaigns. By analyzing features such as customer demographics, previous interactions, and financial data, we aim to optimize marketing strategies for future campaigns.
 
 This repository contains the complete pipeline from data preprocessing, feature engineering, model building, hyperparameter tuning, and model evaluation.
